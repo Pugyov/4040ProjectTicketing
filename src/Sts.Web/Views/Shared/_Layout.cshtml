@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - STS</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="bg-orb bg-orb-left"></div>
+    <div class="bg-orb bg-orb-right"></div>
+
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a asp-controller="Home" asp-action="Index" class="brand">
+                <span class="brand__badge">STS</span>
+                <span class="brand__text">
+                    <strong>Support Ticketing System</strong>
+                    <small>INF 4040 Project B</small>
+                </span>
+            </a>
+
+            <nav class="top-nav">
+                <a asp-controller="Home" asp-action="Index" class="top-nav__link">Home</a>
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <form asp-controller="Account" asp-action="Logout" method="post" class="inline-form">
+                    <button type="submit" class="button button--ghost">Logout</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="top-nav__link">Register</a>
+                <a asp-controller="Account" asp-action="Login" class="button">Login</a>
+            }
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        @RenderBody()
+    </main>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

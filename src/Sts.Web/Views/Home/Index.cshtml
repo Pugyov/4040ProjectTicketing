@@ -1,0 +1,22 @@
+@{
+    ViewData["Title"] = "Welcome";
+}
+
+<section class="hero">
+    <p class="eyebrow">Support Desk Portal</p>
+    <h1>Welcome to STS</h1>
+    <p class="hero__subtitle">
+        Create and track support tickets across Development, Support, and Sales teams.
+    </p>
+    <div class="hero__actions">
+        @if (User.Identity?.IsAuthenticated ?? false)
+        {
+            <span class="pill pill--success">You are logged in</span>
+        }
+        else
+        {
+            <a asp-controller="Account" asp-action="Register" class="button">Create Account</a>
+            <a asp-controller="Account" asp-action="Login" class="button button--ghost">Sign In</a>
+        }
+    </div>
+</section>
