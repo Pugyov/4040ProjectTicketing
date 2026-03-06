@@ -69,11 +69,7 @@ using (var scope = app.Services.CreateScope())
     {
         dbContext.Database.EnsureCreated();
     }
-
-    if (app.Environment.IsDevelopment())
-    {
-        await DbInitializer.SeedDevUserAsync(services);
-    }
+    await DbInitializer.SeedDevUserAsync(services);
 }
 
 app.Run();
