@@ -7,12 +7,34 @@
 **/bin/
 **/obj/
 
-# User-specific files
+# .NET user-specific files
 *.user
+*.rsuser
 *.suo
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+packages/
+
+# Test / coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# Logs
+*.log
+logs/
 
 # Local tools cache
 .config/
 
-# Logs
-*.log
+# Local secrets / machine-specific config
+src/Sts.Web/appsettings.Development.json
+
+# OS / temporary files
+*.swp
+*.tmp
