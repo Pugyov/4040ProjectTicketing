@@ -1,0 +1,19 @@
+@use "variables" as *
+
+.input-validation-error
+  border-color: var(--bs-danger)
+  box-shadow: $validation-shadow
+
+.validation-summary-valid,
+.field-validation-valid
+  display: none
+
+.validation-summary-errors
+  display: block
+
+  ul
+    margin: 0
+    padding-left: 1.25rem
+
+.field-validation-error
+  color: var(--bs-danger)

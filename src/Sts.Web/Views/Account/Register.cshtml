@@ -3,54 +3,60 @@
     ViewData["Title"] = "Register";
 }
 
-<section class="auth-page">
-    <div class="panel">
-        <h1>Register</h1>
-        <p class="panel__subtitle">Create your STS account to access ticket workflows.</p>
+<section class="row justify-content-center">
+    <div class="col-md-10 col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h1 class="h3 mb-2">Register</h1>
+                <p class="text-secondary mb-4">Create your STS account to access ticket workflows.</p>
+                
+                <form asp-action="Register" method="post" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid"
+                         role="alert"></div>
 
-        <form asp-action="Register" method="post" class="form-grid">
-            <div asp-validation-summary="ModelOnly" class="validation-summary" role="alert"></div>
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label"></label>
+                        <input asp-for="Name" autocomplete="name" class="form-control"/>
+                        <span asp-validation-for="Name" class="invalid-feedback d-block"></span>
+                    </div>
 
-            <div class="form-field">
-                <label asp-for="Email"></label>
-                <input asp-for="Email" autocomplete="email" />
-                <span asp-validation-for="Email"></span>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" autocomplete="email" class="form-control"/>
+                        <span asp-validation-for="Email" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Team" class="form-label"></label>
+                        <select asp-for="Team" class="form-select">
+                            <option value="">-- Select Team --</option>
+                            <option value="Development">Development</option>
+                            <option value="Support">Support</option>
+                            <option value="Sales">Sales</option>
+                        </select>
+                        <span asp-validation-for="Team" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" type="password" autocomplete="new-password" class="form-control"/>
+                        <span asp-validation-for="Password" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                        <input asp-for="ConfirmPassword" type="password" autocomplete="new-password"
+                               class="form-control"/>
+                        <span asp-validation-for="ConfirmPassword" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                </form>
             </div>
-
-            <div class="form-field">
-                <label asp-for="Password"></label>
-                <input asp-for="Password" type="password" autocomplete="new-password" />
-                <span asp-validation-for="Password"></span>
-            </div>
-
-            <div class="form-field">
-                <label asp-for="ConfirmPassword"></label>
-                <input asp-for="ConfirmPassword" type="password" autocomplete="new-password" />
-                <span asp-validation-for="ConfirmPassword"></span>
-            </div>
-
-            <div class="form-field">
-                <label asp-for="Name"></label>
-                <input asp-for="Name" autocomplete="name" />
-                <span asp-validation-for="Name"></span>
-            </div>
-
-            <div class="form-field">
-                <label asp-for="Team"></label>
-                <select asp-for="Team">
-                    <option value="">-- Select Team --</option>
-                    <option value="Development">Development</option>
-                    <option value="Support">Support</option>
-                    <option value="Sales">Sales</option>
-                </select>
-                <span asp-validation-for="Team"></span>
-            </div>
-
-            <button type="submit" class="button button--full">Register</button>
-        </form>
+        </div>
     </div>
 </section>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial"/>
 }

@@ -2,21 +2,27 @@
     ViewData["Title"] = "Welcome";
 }
 
-<section class="hero">
-    <p class="eyebrow">Support Desk Portal</p>
-    <h1>Welcome to STS</h1>
-    <p class="hero__subtitle">
-        Create and track support tickets across Development, Support, and Sales teams.
-    </p>
-    <div class="hero__actions">
-        @if (User.Identity?.IsAuthenticated ?? false)
-        {
-            <span class="pill pill--success">You are logged in</span>
-        }
-        else
-        {
-            <a asp-controller="Account" asp-action="Register" class="button">Create Account</a>
-            <a asp-controller="Account" asp-action="Login" class="button button--ghost">Sign In</a>
-        }
+<section class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <p class="text-uppercase text-primary-emphasis small fw-semibold mb-2">Support Desk Portal</p>
+                <h1 class="display-6 mb-3">Welcome to STS</h1>
+                <p class="text-secondary mb-4">
+                    Create and track support tickets across Development, Support, and Sales teams.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <span class="badge text-bg-success fs-6 fw-normal px-3 py-2">You are logged in</span>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary">Create Account</a>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary">Sign In</a>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </section>

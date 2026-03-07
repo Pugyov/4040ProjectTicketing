@@ -8,7 +8,7 @@ using Sts.Web.Validation;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
+                       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -69,6 +69,7 @@ using (var scope = app.Services.CreateScope())
     {
         dbContext.Database.EnsureCreated();
     }
+
     await DbInitializer.SeedDevUserAsync(services);
 }
 

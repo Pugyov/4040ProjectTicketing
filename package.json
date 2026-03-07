@@ -1,0 +1,14 @@
+{
+  "name": "4040projectticketing",
+  "private": true,
+  "scripts": {
+    "sass:build": "sass src/Sts.Web/wwwroot/sass/site.sass src/Sts.Web/wwwroot/css/site.css --no-source-map --style=expanded",
+    "sass:watch": "sass --watch src/Sts.Web/wwwroot/sass/site.sass:src/Sts.Web/wwwroot/css/site.css --style=expanded",
+    "dotnet:run": "dotnet run --project src/Sts.Web/Sts.Web.csproj",
+    "dev": "concurrently -k -n SASS,WEB -c cyan,green \"npm:sass:watch\" \"npm:dotnet:run\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "sass": "^1.93.2"
+  }
+}

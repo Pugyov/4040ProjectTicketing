@@ -38,3 +38,6 @@ src/Sts.Web/appsettings.Development.json
 # OS / temporary files
 *.swp
 *.tmp
+
+# Frontend tooling
+node_modules/
