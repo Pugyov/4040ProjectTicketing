@@ -29,12 +29,16 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
         builder.Entity<Ticket>(entity =>
         {
-            entity.Property(t => t.Title)
+            entity.Property(t => t.Subject)
                 .HasMaxLength(200)
                 .IsRequired();
 
             entity.Property(t => t.Description)
-                .HasMaxLength(2000)
+                .HasMaxLength(2000);
+
+            entity.Property(t => t.Team)
+                .HasConversion<string>()
+                .HasMaxLength(30)
                 .IsRequired();
 
             entity.Property(t => t.Status)

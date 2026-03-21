@@ -74,6 +74,33 @@ public class ViewModelValidationTests
         Assert.Contains(results, r => r.ErrorMessage == "Email must include a valid domain (for example: name@example.com).");
     }
 
+    [Fact]
+    public void CreateTicketViewModel_WithMissingRequiredFields_ShouldFailValidation()
+    {
+        var model = new CreateTicketViewModel();
+
+        var results = Validate(model);
+
+        Assert.Contains(results, r => r.ErrorMessage == "Subject is required.");
+        Assert.Contains(results, r => r.ErrorMessage == "Team is required.");
+        Assert.Contains(results, r => r.ErrorMessage == "Status is required.");
+    }
+
+    [Fact]
+    public void CreateTicketViewModel_WithInvalidStatus_ShouldFailValidation()
+    {
+        var model = new CreateTicketViewModel
+        {
+            Subject = "Broken import",
+            Team = "Development",
+            Status = "InProgress"
+        };
+
+        var results = Validate(model);
+
+        Assert.Contains(results, r => r.ErrorMessage == "Status must be one of: New, Open, Closed.");
+    }
+
     private static RegisterViewModel ValidRegisterModel() => new()
     {
         Email = "valid@example.com",

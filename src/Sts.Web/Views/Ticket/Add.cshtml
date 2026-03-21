@@ -1,0 +1,69 @@
+@model CreateTicketViewModel
+@{
+    ViewData["Title"] = "Add New Ticket";
+}
+
+<section class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-4">
+                    <div>
+                        <p class="text-uppercase text-primary-emphasis small fw-semibold mb-2">Ticket Entry</p>
+                        <h1 class="h3 mb-1">Add New Ticket</h1>
+                        <p class="text-secondary mb-0">Submit a support ticket for Development, Support, or Sales.</p>
+                    </div>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back Home</a>
+                </div>
+
+                <form asp-action="Add" method="post" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger validation-summary-valid" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Subject" class="form-label"></label>
+                        <input asp-for="Subject" class="form-control" />
+                        <span asp-validation-for="Subject" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" rows="5" class="form-control"></textarea>
+                        <span asp-validation-for="Description" class="invalid-feedback d-block"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Team" class="form-label"></label>
+                            <select asp-for="Team" class="form-select">
+                                <option value="">-- Select Team --</option>
+                                <option value="Development">Development</option>
+                                <option value="Support">Support</option>
+                                <option value="Sales">Sales</option>
+                            </select>
+                            <span asp-validation-for="Team" class="invalid-feedback d-block"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label"></label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="">-- Select Status --</option>
+                                <option value="New">New</option>
+                                <option value="Open">Open</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                            <span asp-validation-for="Status" class="invalid-feedback d-block"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Save Ticket</button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}

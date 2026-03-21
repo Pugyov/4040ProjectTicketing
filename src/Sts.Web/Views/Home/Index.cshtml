@@ -1,10 +1,11 @@
+@model HomeIndexViewModel
 @{
     ViewData["Title"] = "Welcome";
 }
 
-<section class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
+<section class="row justify-content-center g-4">
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0 overflow-hidden">
             <div class="card-body p-4 p-md-5">
                 <p class="text-uppercase text-primary-emphasis small fw-semibold mb-2">Support Desk Portal</p>
                 <h1 class="display-6 mb-3">Welcome to STS</h1>
@@ -12,9 +13,11 @@
                     Create and track support tickets across Development, Support, and Sales teams.
                 </p>
                 <div class="d-flex gap-2 flex-wrap">
-                    @if (User.Identity?.IsAuthenticated ?? false)
+                    @if (Model.IsAuthenticated)
                     {
                         <span class="badge text-bg-success fs-6 fw-normal px-3 py-2">You are logged in</span>
+                        <span class="badge text-bg-light border fs-6 fw-normal px-3 py-2">Your team: @Model.CurrentTeam</span>
+                        <a asp-controller="Ticket" asp-action="Add" class="btn btn-primary">Add New Ticket</a>
                     }
                     else
                     {
@@ -25,4 +28,45 @@
             </div>
         </div>
     </div>
+
+    @if (Model.IsAuthenticated)
+    {
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                        <div>
+                            <h2 class="h4 mb-1">Latest Tickets for @Model.CurrentTeam</h2>
+                            <p class="text-secondary mb-0">Showing the 10 most recently added tickets for your team.</p>
+                        </div>
+                        <a asp-controller="Ticket" asp-action="Add" class="btn btn-outline-primary">Add New</a>
+                    </div>
+
+                    @if (Model.RecentTickets.Count == 0)
+                    {
+                        <div class="alert alert-light border mb-0">
+                            No tickets have been added for your team yet.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush recent-ticket-list">
+                            @foreach (var ticket in Model.RecentTickets)
+                            {
+                                <div class="list-group-item px-0 py-3">
+                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                                        <div>
+                                            <h3 class="h6 mb-1">@ticket.Subject</h3>
+                                            <span class="badge text-bg-light border">@ticket.Team</span>
+                                        </div>
+                                        <small class="text-secondary">@ticket.CreatedAtUtc.ToLocalTime().ToString("g")</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
 </section>
