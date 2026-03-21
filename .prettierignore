@@ -1,0 +1,6 @@
+node_modules
+src/Sts.Web/wwwroot/css/site.css
+src/**/bin
+src/**/obj
+tests/**/bin
+tests/**/obj

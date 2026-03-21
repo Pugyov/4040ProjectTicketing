@@ -11,54 +11,61 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
 </head>
 <body>
-<header class="border-bottom bg-white shadow-sm">
+<header class="sts-site-header border-bottom bg-white shadow-sm">
     <div class="container-fluid container-lg px-3 px-sm-4 px-lg-3">
-        <nav class="navbar navbar-expand-lg navbar-light py-2 py-lg-3 px-0">
-            <a asp-controller="Home" asp-action="Index" class="navbar-brand fw-semibold lh-sm me-3">STS</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+        <nav class="navbar navbar-expand-lg navbar-light py-2 py-lg-3 px-0 sts-site-nav">
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand fw-semibold lh-sm me-3 sts-site-nav__brand">STS</a>
+            <button class="navbar-toggler sts-site-nav__toggle" type="button" data-sts-nav-toggle
                     aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse sts-mobile-nav" id="mainNav">
-                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 sts-nav-list">
-                    <li class="nav-item">
-                        <a asp-controller="Home" asp-action="Index" class="nav-link">Home</a>
-                    </li>
-            @* Show auth actions based on login state on every page (Sprint 1 requirement). *@
-            @if (User.Identity?.IsAuthenticated ?? false)
-                {
-                    <li class="nav-item">
-                        <a asp-controller="Ticket" asp-action="Add" class="nav-link">Add New</a>
-                    </li>
-                    <li class="nav-item">
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 d-grid">
-                            <button type="submit" class="btn btn-outline-secondary btn-sm sts-nav-button">Logout</button>
-                        </form>
-                    </li>
-                }
-                else
-                {
-                    <li class="nav-item">
-                        <a asp-controller="Account" asp-action="Register" class="nav-link">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm sts-nav-button">Login</a>
-                    </li>
-                }
-                </ul>
+            <div class="navbar-collapse sts-site-nav__collapse" id="mainNav" aria-hidden="true">
+                <div class="sts-site-nav__panel">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 sts-site-nav__list">
+                        <li class="nav-item sts-site-nav__item">
+                            <a asp-controller="Home" asp-action="Index" class="nav-link sts-site-nav__link">Home</a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item sts-site-nav__item">
+                                <a asp-controller="Ticket" asp-action="Add" class="nav-link sts-site-nav__link">Add
+                                    New</a>
+                            </li>
+                            <li class="nav-item sts-site-nav__item">
+                                <form asp-controller="Account" asp-action="Logout" method="post"
+                                      class="m-0 d-grid sts-site-nav__form">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm sts-site-nav__action">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item sts-site-nav__item">
+                                <a asp-controller="Account" asp-action="Register" class="nav-link sts-site-nav__link">Register</a>
+                            </li>
+                            <li class="nav-item sts-site-nav__item">
+                                <a asp-controller="Account" asp-action="Login"
+                                   class="btn btn-primary btn-sm sts-site-nav__action">Login</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
             </div>
         </nav>
     </div>
 </header>
 
-<main class="container py-4 py-md-5">
+<main class="container py-4 py-md-5 sts-main">
     @RenderBody()
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
+<script src="~/js/site-nav.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

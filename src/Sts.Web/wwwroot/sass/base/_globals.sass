@@ -1,0 +1,20 @@
+@use "../utils/variables" as vars
+@use "../utils/media" as mq
+
+:root
+  --sts-bg: #{vars.$sts-bg}
+
+html,
+body
+  min-height: 100%
+
+body
+  background-color: var(--sts-bg)
+  line-height: vars.$line-height-base
+
+.card
+  border-radius: vars.$radius-md
+
+.sts-main
+  @include mq.tablet
+    padding-top: vars.$space-24

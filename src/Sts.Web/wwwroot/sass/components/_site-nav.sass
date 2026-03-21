@@ -1,0 +1,100 @@
+@use "../utils/variables" as vars
+@use "../utils/media" as mq
+@use "../utils/mixins" as mix
+
+.sts-site-nav__brand
+  font-size: vars.$font-size-nav-brand
+  font-weight: 600
+  max-width: 16ch
+  transition: color vars.$transition-duration-fast vars.$transition-ease-standard
+
+.sts-site-nav__list
+  width: auto
+
+.sts-site-nav__link
+  font-size: vars.$font-size-base
+  font-weight: 500
+  border-radius: vars.$radius-md
+  @include mix.interactive-surface
+  @include mix.focus-ring
+
+.sts-site-nav__action
+  @include mix.interactive-lift
+
+@include mq.tablet
+  .sts-site-nav__brand
+    max-width: 11ch
+
+  .sts-site-nav__toggle
+    flex-shrink: 0
+
+  .sts-site-nav__collapse
+    display: grid
+    grid-template-rows: 0fr
+    flex-basis: 100%
+    width: 100%
+    margin-top: 0
+    padding-top: 0
+    border-top: 1px solid transparent
+    visibility: hidden
+    transition: grid-template-rows vars.$transition-duration-base vars.$transition-ease-standard, margin-top vars.$transition-duration-base vars.$transition-ease-standard, padding-top vars.$transition-duration-base vars.$transition-ease-standard, border-color vars.$transition-duration-base vars.$transition-ease-standard, visibility 0s linear vars.$transition-duration-base
+    will-change: grid-template-rows
+
+  .sts-site-nav--menu-open .sts-site-nav__collapse
+    grid-template-rows: 1fr
+    margin-top: vars.$space-15
+    padding-top: vars.$space-15
+    border-top-color: vars.$sts-border-soft
+    visibility: visible
+    transition: grid-template-rows vars.$transition-duration-base vars.$transition-ease-standard, margin-top vars.$transition-duration-base vars.$transition-ease-standard, padding-top vars.$transition-duration-base vars.$transition-ease-standard, border-color vars.$transition-duration-base vars.$transition-ease-standard
+
+  .sts-site-nav__panel
+    min-height: 0
+    overflow: hidden
+    opacity: 0
+    transform: translateY(-#{vars.$space-5})
+    transition: opacity vars.$transition-duration-base vars.$transition-ease-standard, transform vars.$transition-duration-base vars.$transition-ease-standard
+    will-change: opacity, transform
+    pointer-events: none
+
+  .sts-site-nav--menu-open .sts-site-nav__panel
+    opacity: 1
+    transform: translateY(0)
+    pointer-events: auto
+
+  .sts-site-nav__list
+    gap: vars.$space-5
+    padding-bottom: vars.$space-5
+    width: 100%
+
+  .sts-site-nav__link
+    padding: vars.$space-15
+    background-color: vars.$sts-surface-subtle
+
+  .sts-site-nav__action
+    width: 100%
+    margin-top: vars.$space-10
+    padding-top: vars.$space-12
+    padding-bottom: vars.$space-12
+
+@include mq.media-lg
+  .sts-site-nav__collapse
+    display: flex !important
+    flex-grow: 1
+    flex-basis: auto
+    width: 100%
+    margin-top: 0
+    padding-top: 0
+    border-top: 0
+    visibility: visible
+    transition: none
+
+  .sts-site-nav__panel
+    display: flex
+    justify-content: flex-end
+    width: 100%
+    overflow: visible
+    opacity: 1
+    transform: none
+    pointer-events: auto
+    transition: none

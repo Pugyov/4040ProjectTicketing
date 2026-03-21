@@ -2,6 +2,14 @@
   "name": "4040projectticketing",
   "private": true,
   "scripts": {
+    "format": "npm run format:dotnet && npm run format:web && npm run format:sass && npm run sass:build",
+    "format:check": "npm run format:dotnet:check && npm run format:web:check && npm run format:sass:check",
+    "format:dotnet": "dotnet format whitespace 4040ProjectTicketing.sln --no-restore",
+    "format:dotnet:check": "dotnet format whitespace 4040ProjectTicketing.sln --no-restore --verify-no-changes",
+    "format:web": "prettier --write \"package*.json\" \"src/**/*.{js,json}\" \"tests/**/*.json\"",
+    "format:web:check": "prettier --check \"package*.json\" \"src/**/*.{js,json}\" \"tests/**/*.json\"",
+    "format:sass": "sass-formatter -w $(find src -name '*.sass' -type f)",
+    "format:sass:check": "sass-formatter -ch $(find src -name '*.sass' -type f)",
     "sass:build": "sass src/Sts.Web/wwwroot/sass/site.sass src/Sts.Web/wwwroot/css/site.css --no-source-map --style=expanded",
     "sass:watch": "sass --watch src/Sts.Web/wwwroot/sass/site.sass:src/Sts.Web/wwwroot/css/site.css --style=expanded",
     "dotnet:run": "dotnet run --project src/Sts.Web/Sts.Web.csproj",
@@ -9,6 +17,8 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
-    "sass": "^1.93.2"
+    "prettier": "^3.8.1",
+    "sass": "^1.93.2",
+    "sass-formatter": "^0.8.0"
   }
 }

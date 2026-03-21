@@ -1,0 +1,37 @@
+@use "../utils/variables" as vars
+@use "../utils/media" as mq
+@use "../utils/mixins" as mix
+
+.sts-home__status-pill
+  width: fit-content
+
+.sts-home__action
+  @include mix.interactive-lift
+
+.sts-home__ticket-list > .list-group-item:last-child
+  border-bottom: 0
+
+@include mq.tablet
+  .sts-home__title
+    font-size: 3rem
+
+  .sts-home__copy,
+  .sts-home__tickets-copy
+    font-size: vars.$font-size-copy-lg
+
+  .sts-home__actions > *
+    width: 100%
+    text-align: center
+    justify-content: center
+
+  .sts-home__action
+    width: 100%
+    padding-top: vars.$space-15
+    padding-bottom: vars.$space-15
+
+  .sts-home__tickets-heading
+    font-size: vars.$font-size-section-heading
+
+  .sts-home__timestamp
+    display: block
+    margin-top: vars.$space-5

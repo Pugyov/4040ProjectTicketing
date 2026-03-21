@@ -1,8 +1,8 @@
-@use "variables" as *
+@use "../utils/variables" as vars
 
 .input-validation-error
   border-color: var(--bs-danger)
-  box-shadow: $validation-shadow
+  box-shadow: vars.$validation-shadow
 
 .validation-summary-valid,
 .field-validation-valid
@@ -13,7 +13,7 @@
 
   ul
     margin: 0
-    padding-left: 1.25rem
+    padding-left: 20px
 
 .field-validation-error
   color: var(--bs-danger)

@@ -1,0 +1,9 @@
+{
+  "insertSpaces": true,
+  "tabSize": 2,
+  "convert": true,
+  "deleteEmptyRows": true,
+  "deleteWhitespace": true,
+  "setPropertySpace": true,
+  "lineEnding": "LF"
+}

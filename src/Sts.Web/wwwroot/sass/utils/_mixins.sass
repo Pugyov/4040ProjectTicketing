@@ -1,0 +1,15 @@
+@use "variables" as vars
+
+@mixin focus-ring
+  &:focus-visible
+    box-shadow: vars.$sts-focus-ring
+
+@mixin interactive-surface($duration: vars.$transition-duration-fast)
+  transition: color $duration vars.$transition-ease-standard, background-color $duration vars.$transition-ease-standard, box-shadow $duration vars.$transition-ease-standard
+
+@mixin interactive-lift($duration: vars.$transition-duration-base)
+  transition: background-color $duration vars.$transition-ease-standard, border-color $duration vars.$transition-ease-standard, box-shadow $duration vars.$transition-ease-standard, transform $duration vars.$transition-ease-standard
+
+  &:hover,
+  &:focus-visible
+    transform: translateY(-1px)

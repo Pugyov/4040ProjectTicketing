@@ -3,26 +3,28 @@
     ViewData["Title"] = "Welcome";
 }
 
-<section class="row justify-content-center g-4">
+<section class="sts-home row justify-content-center g-4">
     <div class="col-lg-9">
-        <div class="card shadow-sm border-0 overflow-hidden">
+        <div class="card shadow-sm border-0 overflow-hidden sts-home__hero">
             <div class="card-body p-4 p-md-5">
-                <p class="text-uppercase text-primary-emphasis small fw-semibold mb-2">Support Desk Portal</p>
-                <h1 class="display-6 mb-3 home-hero-title">Welcome to STS</h1>
-                <p class="text-secondary mb-4 home-hero-copy">
+                <p class="text-uppercase text-primary-emphasis small fw-semibold mb-2 sts-home__eyebrow">Support Desk
+                    Portal</p>
+                <h1 class="display-6 mb-3 sts-home__title">Welcome to STS</h1>
+                <p class="text-secondary mb-4 sts-home__copy">
                     Create and track support tickets across Development, Support, and Sales teams.
                 </p>
-                <div class="d-grid gap-2 d-sm-flex flex-sm-wrap home-hero-actions">
+                <div class="d-grid gap-2 d-sm-flex flex-sm-wrap sts-home__actions">
                     @if (Model.IsAuthenticated)
                     {
-                        <span class="badge text-bg-success fs-6 fw-normal px-3 py-2 home-status-pill">You are logged in</span>
-                        <span class="badge text-bg-light border fs-6 fw-normal px-3 py-2 home-status-pill">Your team: @Model.CurrentTeam</span>
-                        <a asp-controller="Ticket" asp-action="Add" class="btn btn-primary home-primary-action">Add New Ticket</a>
+                        <span class="badge text-bg-success fs-6 fw-normal px-3 py-2 sts-home__status-pill">You are logged in</span>
+                        <span class="badge text-bg-light border fs-6 fw-normal px-3 py-2 sts-home__status-pill">Your team: @Model.CurrentTeam</span>
                     }
                     else
                     {
-                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary home-primary-action">Create Account</a>
-                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary home-secondary-action">Sign In</a>
+                        <a asp-controller="Account" asp-action="Register"
+                           class="btn btn-primary sts-home__action sts-home__action--primary">Create Account</a>
+                        <a asp-controller="Account" asp-action="Login"
+                           class="btn btn-outline-secondary sts-home__action sts-home__action--secondary">Sign In</a>
                     }
                 </div>
             </div>
@@ -32,14 +34,17 @@
     @if (Model.IsAuthenticated)
     {
         <div class="col-lg-9">
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 sts-home__tickets">
                 <div class="card-body p-4">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                    <div
+                        class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
                         <div>
-                            <h2 class="h4 mb-1 recent-ticket-heading">Latest Tickets for @Model.CurrentTeam</h2>
-                            <p class="text-secondary mb-0 recent-ticket-copy">Showing the 10 most recently added tickets for your team.</p>
+                            <h2 class="h4 mb-1 sts-home__tickets-heading">Latest Tickets for @Model.CurrentTeam</h2>
+                            <p class="text-secondary mb-0 sts-home__tickets-copy">Showing the 10 most recently added
+                                tickets for your team.</p>
                         </div>
-                        <a asp-controller="Ticket" asp-action="Add" class="btn btn-outline-primary home-list-action">Add New</a>
+                        <a asp-controller="Ticket" asp-action="Add"
+                           class="btn btn-outline-primary sts-home__action sts-home__action--list">Add New</a>
                     </div>
 
                     @if (Model.RecentTickets.Count == 0)
@@ -50,16 +55,18 @@
                     }
                     else
                     {
-                        <div class="list-group list-group-flush recent-ticket-list">
+                        <div class="list-group list-group-flush sts-home__ticket-list">
                             @foreach (var ticket in Model.RecentTickets)
                             {
-                                <div class="list-group-item px-0 py-3">
-                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                                <div class="list-group-item px-0 py-3 sts-home__ticket-item">
+                                    <div
+                                        class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
                                         <div>
                                             <h3 class="h6 mb-1">@ticket.Subject</h3>
                                             <span class="badge text-bg-light border">@ticket.Team</span>
                                         </div>
-                                        <small class="text-secondary ticket-timestamp">@ticket.CreatedAtUtc.ToLocalTime().ToString("g")</small>
+                                        <small
+                                            class="text-secondary sts-home__timestamp">@ticket.CreatedAtUtc.ToLocalTime().ToString("g")</small>
                                     </div>
                                 </div>
                             }
