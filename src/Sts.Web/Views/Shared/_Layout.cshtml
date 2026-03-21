@@ -12,15 +12,16 @@
 </head>
 <body>
 <header class="border-bottom bg-white shadow-sm">
-    <nav class="navbar navbar-expand-sm navbar-light container py-2">
-        <a asp-controller="Home" asp-action="Index" class="navbar-brand fw-semibold">Support Ticketing System</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
-                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <div class="container-fluid container-lg px-3 px-sm-4 px-lg-3">
+        <nav class="navbar navbar-expand-lg navbar-light py-2 py-lg-3 px-0">
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand fw-semibold lh-sm me-3">STS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-            <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav ms-auto align-items-sm-center gap-sm-2">
+            <div class="collapse navbar-collapse sts-mobile-nav" id="mainNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 sts-nav-list">
                     <li class="nav-item">
                         <a asp-controller="Home" asp-action="Index" class="nav-link">Home</a>
                     </li>
@@ -31,8 +32,8 @@
                         <a asp-controller="Ticket" asp-action="Add" class="nav-link">Add New</a>
                     </li>
                     <li class="nav-item">
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
-                            <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 d-grid">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm sts-nav-button">Logout</button>
                         </form>
                     </li>
                 }
@@ -42,12 +43,13 @@
                         <a asp-controller="Account" asp-action="Register" class="nav-link">Register</a>
                     </li>
                     <li class="nav-item">
-                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm">Login</a>
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm sts-nav-button">Login</a>
                     </li>
                 }
-            </ul>
-        </div>
-    </nav>
+                </ul>
+            </div>
+        </nav>
+    </div>
 </header>
 
 <main class="container py-4 py-md-5">
