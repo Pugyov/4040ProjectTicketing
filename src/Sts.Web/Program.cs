@@ -71,7 +71,7 @@ using (var scope = app.Services.CreateScope())
         dbContext.Database.EnsureCreated();
     }
 
-    await DbInitializer.SeedDevUserAsync(services);
+    await DbInitializer.SeedDemoDataAsync(services);
 }
 
 app.Run();

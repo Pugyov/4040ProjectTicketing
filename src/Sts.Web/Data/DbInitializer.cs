@@ -6,95 +6,100 @@ namespace Sts.Web.Data;
 
 public static class DbInitializer
 {
-    private const string DevUserEmail = "dev@sts.com";
-    private const string DevUserPassword = "Dev123";
+    public const string DemoUserPassword = "Dev123";
 
-    public static async Task SeedDevUserAsync(IServiceProvider services)
+    private static readonly DemoUserSeed[] DemoUsers =
+    {
+        new("dev@sts.com", "Dev User", Team.Development),
+        new("support@sts.com", "Support User", Team.Support),
+        new("sales@sts.com", "Sales User", Team.Sales)
+    };
+
+    public static async Task SeedDemoDataAsync(IServiceProvider services)
     {
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var dbContext = services.GetRequiredService<AppDbContext>();
 
-        var devUser = await userManager.FindByEmailAsync(DevUserEmail);
-        if (devUser is null)
+        foreach (var demoUserSeed in DemoUsers)
         {
-            devUser = new ApplicationUser
+            var user = await userManager.FindByEmailAsync(demoUserSeed.Email);
+            if (user is null)
             {
-                UserName = DevUserEmail,
-                Email = DevUserEmail,
-                Name = "Dev User",
-                Team = Team.Development,
-                EmailConfirmed = true
-            };
+                user = new ApplicationUser
+                {
+                    UserName = demoUserSeed.Email,
+                    Email = demoUserSeed.Email,
+                    Name = demoUserSeed.Name,
+                    Team = demoUserSeed.Team,
+                    EmailConfirmed = true
+                };
 
-            await userManager.CreateAsync(devUser, DevUserPassword);
+                await userManager.CreateAsync(user, DemoUserPassword);
+            }
+
+            var hasSeededTickets = await dbContext.Tickets
+                .AnyAsync(ticket => ticket.CreatedByUserId == user.Id);
+
+            if (hasSeededTickets)
+            {
+                continue;
+            }
+
+            dbContext.Tickets.AddRange(BuildTicketsForUser(user));
         }
-
-        var hasSeededTickets = await dbContext.Tickets
-            .AnyAsync(ticket => ticket.CreatedByUserId == devUser.Id);
-
-        if (hasSeededTickets)
-        {
-            return;
-        }
-
-        var baseTimeUtc = new DateTime(2026, 3, 24, 8, 0, 0, DateTimeKind.Utc);
-
-        dbContext.Tickets.AddRange(
-            new Ticket
-            {
-                Subject = "Printer offline in room 204",
-                Description = "The network printer is not responding to print jobs.",
-                Team = Team.Development,
-                Status = TicketStatus.New,
-                CreatedByUserId = devUser.Id,
-                CreatedAtUtc = baseTimeUtc.AddMinutes(5)
-            },
-            new Ticket
-            {
-                Subject = "Customer portal login timeout",
-                Description = "Users report a timeout after submitting valid credentials.",
-                Team = Team.Development,
-                Status = TicketStatus.Open,
-                CreatedByUserId = devUser.Id,
-                CreatedAtUtc = baseTimeUtc.AddMinutes(15)
-            },
-            new Ticket
-            {
-                Subject = "Sales dashboard export issue",
-                Description = "CSV export returns an empty file for filtered results.",
-                Team = Team.Development,
-                Status = TicketStatus.Open,
-                CreatedByUserId = devUser.Id,
-                CreatedAtUtc = baseTimeUtc.AddMinutes(25)
-            },
-            new Ticket
-            {
-                Subject = "Broken password reset email template",
-                Description = "Reset emails are missing the action link for some users.",
-                Team = Team.Development,
-                Status = TicketStatus.New,
-                CreatedByUserId = devUser.Id,
-                CreatedAtUtc = baseTimeUtc.AddMinutes(35)
-            },
-            new Ticket
-            {
-                Subject = "Profile page validation message overlap",
-                Description = "Validation text overlaps the save button on narrow screens.",
-                Team = Team.Development,
-                Status = TicketStatus.Closed,
-                CreatedByUserId = devUser.Id,
-                CreatedAtUtc = baseTimeUtc.AddMinutes(45)
-            },
-            new Ticket
-            {
-                Subject = "Reporting API returns 500 on large payloads",
-                Description = "The endpoint fails when generating monthly summary reports.",
-                Team = Team.Development,
-                Status = TicketStatus.Open,
-                CreatedByUserId = devUser.Id,
-                CreatedAtUtc = baseTimeUtc.AddMinutes(55)
-            });
 
         await dbContext.SaveChangesAsync();
     }
+
+    private static IEnumerable<Ticket> BuildTicketsForUser(ApplicationUser user)
+    {
+        var baseTimeUtc = new DateTime(2026, 3, 24, 8, 0, 0, DateTimeKind.Utc)
+            .AddHours((int)user.Team - 1);
+
+        var ticketSeeds = user.Team switch
+        {
+            Team.Development => new[]
+            {
+                new TicketSeed("Printer offline in room 204", "The network printer is not responding to print jobs.", TicketStatus.New),
+                new TicketSeed("Customer portal login timeout", "Users report a timeout after submitting valid credentials.", TicketStatus.Open),
+                new TicketSeed("Sales dashboard export issue", "CSV export returns an empty file for filtered results.", TicketStatus.Open),
+                new TicketSeed("Broken password reset email template", "Reset emails are missing the action link for some users.", TicketStatus.New),
+                new TicketSeed("Profile page validation message overlap", "Validation text overlaps the save button on narrow screens.", TicketStatus.Closed),
+                new TicketSeed("Reporting API returns 500 on large payloads", "The endpoint fails when generating monthly summary reports.", TicketStatus.Open)
+            },
+            Team.Support => new[]
+            {
+                new TicketSeed("VPN access request backlog", "Several new employees still cannot connect to the company VPN.", TicketStatus.New),
+                new TicketSeed("Shared mailbox sync issue", "The team inbox stops syncing after Outlook is reopened.", TicketStatus.Open),
+                new TicketSeed("Laptop battery replacement follow-up", "Two devices are still waiting for hardware service.", TicketStatus.Open),
+                new TicketSeed("Helpdesk phone queue misrouting", "Calls for billing are being routed to general support.", TicketStatus.New),
+                new TicketSeed("Office Wi-Fi guest password update", "Reception needs the new guest credentials posted.", TicketStatus.Closed),
+                new TicketSeed("Adobe license activation problem", "A designer cannot activate the assigned Creative Cloud seat.", TicketStatus.Open)
+            },
+            Team.Sales => new[]
+            {
+                new TicketSeed("Lead import duplicate records", "The latest CSV import created duplicated contacts in the CRM.", TicketStatus.New),
+                new TicketSeed("Quote approval email delay", "Approval notifications arrive several minutes late.", TicketStatus.Open),
+                new TicketSeed("Pipeline dashboard filter mismatch", "Quarterly filters show totals that do not match the raw report.", TicketStatus.Open),
+                new TicketSeed("Discount form missing regional options", "The discount request form does not list all sales regions.", TicketStatus.New),
+                new TicketSeed("Expired campaign list cleanup", "Old campaign entries were removed from the weekly dashboard.", TicketStatus.Closed),
+                new TicketSeed("Opportunity stage audit request", "Management requested a review of stale opportunities in negotiation.", TicketStatus.Open)
+            },
+            _ => Array.Empty<TicketSeed>()
+        };
+
+        return ticketSeeds.Select((ticket, index) => new Ticket
+        {
+            Subject = ticket.Subject,
+            Description = ticket.Description,
+            Team = user.Team,
+            Status = ticket.Status,
+            CreatedByUserId = user.Id,
+            CreatedAtUtc = baseTimeUtc.AddMinutes((index + 1) * 10)
+        });
+    }
+
+    private sealed record DemoUserSeed(string Email, string Name, Team Team);
+
+    private sealed record TicketSeed(string Subject, string Description, TicketStatus Status);
 }

@@ -10,32 +10,44 @@ namespace Sts.Web.Tests.Unit;
 public class DbInitializerTests
 {
     [Fact]
-    public async Task SeedDevUserAsync_ShouldCreateDevUserAndSampleTickets_WithoutDuplicates()
+    public async Task SeedDemoDataAsync_ShouldCreateDemoUsersAndSampleTickets_ForAllTeams_WithoutDuplicates()
     {
         using var scope = BuildScope();
         var services = scope.ServiceProvider;
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var dbContext = services.GetRequiredService<AppDbContext>();
 
-        await DbInitializer.SeedDevUserAsync(services);
+        await DbInitializer.SeedDemoDataAsync(services);
 
-        var devUser = await userManager.FindByEmailAsync("dev@sts.com");
-        Assert.NotNull(devUser);
-        Assert.True(await userManager.CheckPasswordAsync(devUser!, "Dev123"));
+        var expectedUsers = new (string Email, Team Team)[]
+        {
+            ("dev@sts.com", Team.Development),
+            ("support@sts.com", Team.Support),
+            ("sales@sts.com", Team.Sales)
+        };
 
-        var tickets = await dbContext.Tickets
-            .Where(ticket => ticket.CreatedByUserId == devUser!.Id)
-            .OrderBy(ticket => ticket.CreatedAtUtc)
-            .ToListAsync();
+        foreach (var expectedUser in expectedUsers)
+        {
+            var user = await userManager.FindByEmailAsync(expectedUser.Email);
+            Assert.NotNull(user);
+            Assert.Equal(expectedUser.Team, user!.Team);
+            Assert.True(await userManager.CheckPasswordAsync(user, DbInitializer.DemoUserPassword));
 
-        Assert.NotEmpty(tickets);
-        Assert.All(tickets, ticket => Assert.Equal(Team.Development, ticket.Team));
+            var tickets = await dbContext.Tickets
+                .Where(ticket => ticket.CreatedByUserId == user.Id)
+                .OrderBy(ticket => ticket.CreatedAtUtc)
+                .ToListAsync();
 
-        var firstCount = tickets.Count;
+            Assert.Equal(6, tickets.Count);
+            Assert.All(tickets, ticket => Assert.Equal(expectedUser.Team, ticket.Team));
+        }
 
-        await DbInitializer.SeedDevUserAsync(services);
+        var firstCount = await dbContext.Tickets.CountAsync();
+        Assert.Equal(18, firstCount);
 
-        var secondCount = await dbContext.Tickets.CountAsync(ticket => ticket.CreatedByUserId == devUser.Id);
+        await DbInitializer.SeedDemoDataAsync(services);
+
+        var secondCount = await dbContext.Tickets.CountAsync();
         Assert.Equal(firstCount, secondCount);
     }
 
