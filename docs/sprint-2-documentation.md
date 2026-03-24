@@ -63,126 +63,81 @@ This story required the application to use Bootstrap for rendering all pages, pr
 
 To implement this functionality, Viktor updated the shared layout of the application so that all pages use a common Bootstrap-based header and navigation bar. Bootstrap 5.3.8 is loaded from a CDN, the viewport meta tag is configured for responsive rendering, and the menu contents are generated conditionally based on the visitor's authentication status.
 
-Here is a snippet from the shared layout:
+Here is a shorter excerpt from the shared layout showing the navigation toggle and the conditional menu links:
 
 ```cshtml
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"/>
+<button class="navbar-toggler sts-site-nav__toggle" type="button" data-sts-nav-toggle
+        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+</button>
 
-<header class="sts-site-header border-bottom bg-white shadow-sm">
-    <div class="container-fluid container-lg px-3 px-sm-4 px-lg-3">
-        <nav class="navbar navbar-expand-lg navbar-light py-2 py-lg-3 px-0 sts-site-nav">
-            <a asp-controller="Home" asp-action="Index" class="navbar-brand fw-semibold lh-sm me-3 sts-site-nav__brand">STS</a>
-            <button class="navbar-toggler sts-site-nav__toggle" type="button" data-sts-nav-toggle
-                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="navbar-collapse sts-site-nav__collapse" id="mainNav" aria-hidden="true">
-                <div class="sts-site-nav__panel">
-                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 sts-site-nav__list">
-                        <li class="nav-item sts-site-nav__item">
-                            <a asp-controller="Home" asp-action="Index" class="nav-link sts-site-nav__link">Home</a>
-                        </li>
-                        @if (User.Identity?.IsAuthenticated ?? false)
-                        {
-                            <li class="nav-item sts-site-nav__item">
-                                <a asp-controller="Ticket" asp-action="Add" class="nav-link sts-site-nav__link">Add
-                                    New</a>
-                            </li>
-                            <li class="nav-item sts-site-nav__item">
-                                <form asp-controller="Account" asp-action="Logout" method="post"
-                                      class="m-0 d-grid sts-site-nav__form">
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm sts-site-nav__action">
-                                        Logout
-                                    </button>
-                                </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item sts-site-nav__item">
-                                <a asp-controller="Account" asp-action="Register" class="nav-link sts-site-nav__link">Register</a>
-                            </li>
-                            <li class="nav-item sts-site-nav__item">
-                                <a asp-controller="Account" asp-action="Login"
-                                   class="btn btn-primary btn-sm sts-site-nav__action">Login</a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </nav>
+<div class="navbar-collapse sts-site-nav__collapse" id="mainNav" aria-hidden="true">
+    <div class="sts-site-nav__panel">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 sts-site-nav__list">
+            <li class="nav-item sts-site-nav__item">
+                <a asp-controller="Home" asp-action="Index" class="nav-link sts-site-nav__link">Home</a>
+            </li>
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <li class="nav-item sts-site-nav__item">
+                    <a asp-controller="Ticket" asp-action="Add" class="nav-link sts-site-nav__link">Add
+                        New</a>
+                </li>
+                <li class="nav-item sts-site-nav__item">
+                    <form asp-controller="Account" asp-action="Logout" method="post"
+                          class="m-0 d-grid sts-site-nav__form">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm sts-site-nav__action">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item sts-site-nav__item">
+                    <a asp-controller="Account" asp-action="Register" class="nav-link sts-site-nav__link">Register</a>
+                </li>
+                <li class="nav-item sts-site-nav__item">
+                    <a asp-controller="Account" asp-action="Login"
+                       class="btn btn-primary btn-sm sts-site-nav__action">Login</a>
+                </li>
+            }
+        </ul>
     </div>
-</header>
+</div>
 ```
 
-In order to make the navigation work cleanly on smaller screens, a custom JavaScript menu toggle was added. This script opens and closes the navigation panel on mobile view and closes the menu when the user selects an action or presses the Escape key.
+In order to make the navigation work cleanly on smaller screens, a custom JavaScript menu toggle was added. The following excerpt shows the menu state handling:
 
 ```javascript
-document.addEventListener("DOMContentLoaded", () => {
-  const nav = document.querySelector(".sts-site-nav");
-  const toggle = nav?.querySelector("[data-sts-nav-toggle]");
-  const menu = nav?.querySelector("#mainNav");
+const desktopMedia = window.matchMedia("(min-width: 992px)");
+const openClass = "sts-site-nav--menu-open";
+const closeTargets = ".sts-site-nav__link, .sts-site-nav__action";
 
-  if (!nav || !toggle || !menu) {
+const render = () => {
+  const isOpen = !desktopMedia.matches && nav.classList.contains(openClass);
+  nav.classList.toggle(openClass, isOpen);
+  toggle.setAttribute("aria-expanded", String(isOpen));
+
+  if (desktopMedia.matches) {
+    menu.removeAttribute("aria-hidden");
     return;
   }
 
-  const desktopMedia = window.matchMedia("(min-width: 992px)");
-  const openClass = "sts-site-nav--menu-open";
+  menu.setAttribute("aria-hidden", String(!isOpen));
+};
 
-  const render = () => {
-    const isOpen = !desktopMedia.matches && nav.classList.contains(openClass);
-    nav.classList.toggle(openClass, isOpen);
-    toggle.setAttribute("aria-expanded", String(isOpen));
+const closeMenu = () => {
+  nav.classList.remove(openClass);
+  render();
+};
 
-    if (desktopMedia.matches) {
-      menu.removeAttribute("aria-hidden");
-      return;
-    }
+toggle.addEventListener("click", () => {
+  if (desktopMedia.matches) {
+    return;
+  }
 
-    menu.setAttribute("aria-hidden", String(!isOpen));
-  };
-
-  const closeMenu = () => {
-    nav.classList.remove(openClass);
-    render();
-  };
-
-  toggle.addEventListener("click", () => {
-    if (desktopMedia.matches) {
-      return;
-    }
-
-    nav.classList.toggle(openClass);
-    render();
-  });
-
-  nav.addEventListener("click", (event) => {
-    if (desktopMedia.matches) {
-      return;
-    }
-
-    if (event.target instanceof Element && event.target.closest(closeTargets)) {
-      closeMenu();
-    }
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || !nav.classList.contains(openClass)) {
-      return;
-    }
-
-    closeMenu();
-    toggle.focus();
-  });
-
-  desktopMedia.addEventListener("change", render);
-
+  nav.classList.toggle(openClass);
   render();
 });
 ```
@@ -214,12 +169,6 @@ The ticket entry form is defined in the Razor View as follows:
         <span asp-validation-for="Subject" class="invalid-feedback d-block"></span>
     </div>
 
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" rows="5" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="invalid-feedback d-block"></span>
-    </div>
-
     <div class="row g-3">
         <div class="col-md-6">
             <label asp-for="Team" class="form-label"></label>
@@ -242,119 +191,88 @@ The ticket entry form is defined in the Razor View as follows:
             <span asp-validation-for="Status" class="invalid-feedback d-block"></span>
         </div>
     </div>
-
-    <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
-        <button type="submit" class="btn btn-primary">Save Ticket</button>
-        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-    </div>
 </form>
 ```
 
 Viktor also contributed to the validation rules by using a dedicated view model together with custom validation attributes. The `CreateTicketViewModel` ensures that the required fields are present, while the `AllowedTeam` and `AllowedTicketStatus` attributes guarantee that only valid team and status values are accepted.
 
 ```csharp
-public class CreateTicketViewModel
-{
-    [Required(ErrorMessage = "Subject is required.")]
-    [StringLength(200, ErrorMessage = "Subject must be at most 200 characters long.")]
-    public string Subject { get; set; } = string.Empty;
+[Required(ErrorMessage = "Subject is required.")]
+[StringLength(200, ErrorMessage = "Subject must be at most 200 characters long.")]
+public string Subject { get; set; } = string.Empty;
 
-    [StringLength(2000, ErrorMessage = "Description must be at most 2000 characters long.")]
-    public string? Description { get; set; }
+[AllowedTeam]
+public string Team { get; set; } = string.Empty;
 
-    [AllowedTeam]
-    public string Team { get; set; } = string.Empty;
-
-    [AllowedTicketStatus]
-    public string Status { get; set; } = string.Empty;
-}
+[AllowedTicketStatus]
+public string Status { get; set; } = string.Empty;
 ```
 
 Nikolay focused on the server-side workflow of the feature. He implemented the authenticated controller actions, ensured that the current user is identified before a ticket is saved, added the service logic for creating tickets, and handled the redirect back to the home page after a successful submission.
 
-Here is a snippet from the controller action that processes the ticket entry:
+Here is a shorter excerpt from the controller action that processes the ticket entry:
 
 ```csharp
-[HttpPost]
-public async Task<IActionResult> Add(CreateTicketViewModel model)
+ModelState.Clear();
+if (!TryValidateModel(model))
 {
-    model.Subject = model.Subject.Trim();
-    model.Description = model.Description?.Trim();
-    model.Team = model.Team.Trim();
-    model.Status = model.Status.Trim();
-
-    ModelState.Clear();
-    if (!TryValidateModel(model))
-    {
-        return View(model);
-    }
-
-    var user = await _userManager.GetUserAsync(User);
-    if (user is null)
-    {
-        return Challenge();
-    }
-
-    Enum.TryParse<Team>(model.Team, out var team);
-    Enum.TryParse<TicketStatus>(model.Status, out var status);
-
-    var result = await _ticketService.CreateAsync(new CreateTicketRequest
-    {
-        Subject = model.Subject,
-        Description = model.Description,
-        Team = team,
-        Status = status,
-        CreatedByUserId = user.Id
-    });
-
-    if (!result.Succeeded)
-    {
-        foreach (var (key, errors) in result.Errors)
-        {
-            foreach (var error in errors)
-            {
-                ModelState.AddModelError(key, error);
-            }
-        }
-
-        return View(model);
-    }
-
-    return RedirectToAction("Index", "Home");
+    return View(model);
 }
+
+var user = await _userManager.GetUserAsync(User);
+if (user is null)
+{
+    return Challenge();
+}
+
+var result = await _ticketService.CreateAsync(new CreateTicketRequest
+{
+    Subject = model.Subject,
+    Description = model.Description,
+    Team = team,
+    Status = status,
+    CreatedByUserId = user.Id
+});
+
+if (!result.Succeeded)
+{
+    foreach (var (key, errors) in result.Errors)
+    {
+        foreach (var error in errors)
+        {
+            ModelState.AddModelError(key, error);
+        }
+    }
+
+    return View(model);
+}
+
+return RedirectToAction("Index", "Home");
 ```
 
 The persistence logic is implemented in the ticket service. It creates a new `Ticket` entity, sets the insertion timestamp, and saves the record through Entity Framework Core.
 
 ```csharp
-public async Task<TicketCreationResult> CreateAsync(CreateTicketRequest request)
+var ticket = new Ticket
 {
-    if (string.IsNullOrWhiteSpace(request.CreatedByUserId))
-    {
-        return TicketCreationResult.Failed((string.Empty, "Unable to determine the current user."));
-    }
+    Subject = request.Subject,
+    Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description,
+    Team = request.Team,
+    Status = request.Status,
+    CreatedByUserId = request.CreatedByUserId,
+    CreatedAtUtc = DateTime.UtcNow
+};
 
-    var ticket = new Ticket
-    {
-        Subject = request.Subject,
-        Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description,
-        Team = request.Team,
-        Status = request.Status,
-        CreatedByUserId = request.CreatedByUserId,
-        CreatedAtUtc = DateTime.UtcNow
-    };
+_dbContext.Tickets.Add(ticket);
 
-    _dbContext.Tickets.Add(ticket);
-
-    try
-    {
-        await _dbContext.SaveChangesAsync();
-        return TicketCreationResult.Success();
-    }
-    catch (DbUpdateException)
-    {
-        return TicketCreationResult.Failed((string.Empty, "The ticket could not be saved. Please try again."));
-    }
+try
+{
+    await _dbContext.SaveChangesAsync();
+    return TicketCreationResult.Success();
+}
+catch (DbUpdateException)
+{
+    return TicketCreationResult.Failed((string.Empty, "The ticket could not be saved. Please try again."));
 }
 ```
 
@@ -374,30 +292,21 @@ This story required the home screen for authenticated users to be updated so tha
 To implement this functionality, Nikolay extended the `HomeController` so that, when the current user is authenticated, the application loads the user's team and requests the 10 newest tickets for that team from the ticket service.
 
 ```csharp
-[HttpGet]
-public async Task<IActionResult> Index()
+if (!model.IsAuthenticated)
 {
-    var model = new HomeIndexViewModel
-    {
-        IsAuthenticated = User.Identity?.IsAuthenticated ?? false
-    };
-
-    if (!model.IsAuthenticated)
-    {
-        return View(model);
-    }
-
-    var user = await _userManager.GetUserAsync(User);
-    if (user is null)
-    {
-        model.IsAuthenticated = false;
-        return View(model);
-    }
-
-    model.CurrentTeam = user.Team;
-    model.RecentTickets = await _ticketService.GetRecentTicketsForTeamAsync(user.Team, 10);
     return View(model);
 }
+
+var user = await _userManager.GetUserAsync(User);
+if (user is null)
+{
+    model.IsAuthenticated = false;
+    return View(model);
+}
+
+model.CurrentTeam = user.Team;
+model.RecentTickets = await _ticketService.GetRecentTicketsForTeamAsync(user.Team, 10);
+return View(model);
 ```
 
 The actual filtering, ordering, and limiting logic is implemented in the ticket service. The query returns only tickets that belong to the current team, orders them by insertion time in descending order, and limits the result to the newest 10 entries.
@@ -420,52 +329,35 @@ public async Task<IReadOnlyList<RecentTicketListItem>> GetRecentTicketsForTeamAs
 }
 ```
 
-The Razor View was then updated so that authenticated users see a section on the home page containing the latest tickets for their team. If there are no tickets yet, the system displays a helpful empty-state message instead of an empty list.
+The Razor View was then updated so that authenticated users see a section on the home page containing the latest tickets for their team. The following excerpt shows the heading and the rendered ticket items:
 
 ```cshtml
 @if (Model.IsAuthenticated)
 {
-    <div class="col-lg-9">
-        <div class="card shadow-sm border-0 sts-home__tickets">
-            <div class="card-body p-4">
-                <div
-                    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
-                    <div>
-                        <h2 class="h4 mb-1 sts-home__tickets-heading">Latest Tickets for @Model.CurrentTeam</h2>
-                        <p class="text-secondary mb-0 sts-home__tickets-copy">Showing the 10 most recently added
-                            tickets for your team.</p>
-                    </div>
-                    <a asp-controller="Ticket" asp-action="Add"
-                       class="btn btn-outline-primary sts-home__action sts-home__action--list">Add New</a>
-                </div>
-
-                @if (Model.RecentTickets.Count == 0)
-                {
-                    <div class="alert alert-light border mb-0">
-                        No tickets have been added for your team yet.
-                    </div>
-                }
-                else
-                {
-                    <div class="list-group list-group-flush sts-home__ticket-list">
-                        @foreach (var ticket in Model.RecentTickets)
-                        {
-                            <div class="list-group-item px-0 py-3 sts-home__ticket-item">
-                                <div
-                                    class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
-                                    <div>
-                                        <h3 class="h6 mb-1">@ticket.Subject</h3>
-                                        <span class="badge text-bg-light border">@ticket.Team</span>
-                                    </div>
-                                    <small
-                                        class="text-secondary sts-home__timestamp">@ticket.CreatedAtUtc.ToLocalTime().ToString("g")</small>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
+    <div
+        class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+        <div>
+            <h2 class="h4 mb-1 sts-home__tickets-heading">Latest Tickets for @Model.CurrentTeam</h2>
+            <p class="text-secondary mb-0 sts-home__tickets-copy">Showing the 10 most recently added
+                tickets for your team.</p>
         </div>
+    </div>
+
+    <div class="list-group list-group-flush sts-home__ticket-list">
+        @foreach (var ticket in Model.RecentTickets)
+        {
+            <div class="list-group-item px-0 py-3 sts-home__ticket-item">
+                <div
+                    class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                    <div>
+                        <h3 class="h6 mb-1">@ticket.Subject</h3>
+                        <span class="badge text-bg-light border">@ticket.Team</span>
+                    </div>
+                    <small
+                        class="text-secondary sts-home__timestamp">@ticket.CreatedAtUtc.ToLocalTime().ToString("g")</small>
+                </div>
+            </div>
+        }
     </div>
 }
 ```
