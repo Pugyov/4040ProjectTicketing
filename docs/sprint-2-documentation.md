@@ -76,31 +76,45 @@ Here is a snippet from the shared layout:
     <div class="container-fluid container-lg px-3 px-sm-4 px-lg-3">
         <nav class="navbar navbar-expand-lg navbar-light py-2 py-lg-3 px-0 sts-site-nav">
             <a asp-controller="Home" asp-action="Index" class="navbar-brand fw-semibold lh-sm me-3 sts-site-nav__brand">STS</a>
+            <button class="navbar-toggler sts-site-nav__toggle" type="button" data-sts-nav-toggle
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-            ...
-
-            @if (User.Identity?.IsAuthenticated ?? false)
-            {
-                <li class="nav-item sts-site-nav__item">
-                    <a asp-controller="Ticket" asp-action="Add" class="nav-link sts-site-nav__link">Add New</a>
-                </li>
-                <li class="nav-item sts-site-nav__item">
-                    <form asp-controller="Account" asp-action="Logout" method="post" class="m-0 d-grid sts-site-nav__form">
-                        <button type="submit" class="btn btn-outline-secondary btn-sm sts-site-nav__action">
-                            Logout
-                        </button>
-                    </form>
-                </li>
-            }
-            else
-            {
-                <li class="nav-item sts-site-nav__item">
-                    <a asp-controller="Account" asp-action="Register" class="nav-link sts-site-nav__link">Register</a>
-                </li>
-                <li class="nav-item sts-site-nav__item">
-                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm sts-site-nav__action">Login</a>
-                </li>
-            }
+            <div class="navbar-collapse sts-site-nav__collapse" id="mainNav" aria-hidden="true">
+                <div class="sts-site-nav__panel">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2 sts-site-nav__list">
+                        <li class="nav-item sts-site-nav__item">
+                            <a asp-controller="Home" asp-action="Index" class="nav-link sts-site-nav__link">Home</a>
+                        </li>
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item sts-site-nav__item">
+                                <a asp-controller="Ticket" asp-action="Add" class="nav-link sts-site-nav__link">Add
+                                    New</a>
+                            </li>
+                            <li class="nav-item sts-site-nav__item">
+                                <form asp-controller="Account" asp-action="Logout" method="post"
+                                      class="m-0 d-grid sts-site-nav__form">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm sts-site-nav__action">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item sts-site-nav__item">
+                                <a asp-controller="Account" asp-action="Register" class="nav-link sts-site-nav__link">Register</a>
+                            </li>
+                            <li class="nav-item sts-site-nav__item">
+                                <a asp-controller="Account" asp-action="Login"
+                                   class="btn btn-primary btn-sm sts-site-nav__action">Login</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
         </nav>
     </div>
 </header>
@@ -125,14 +139,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const isOpen = !desktopMedia.matches && nav.classList.contains(openClass);
     nav.classList.toggle(openClass, isOpen);
     toggle.setAttribute("aria-expanded", String(isOpen));
+
+    if (desktopMedia.matches) {
+      menu.removeAttribute("aria-hidden");
+      return;
+    }
+
+    menu.setAttribute("aria-hidden", String(!isOpen));
+  };
+
+  const closeMenu = () => {
+    nav.classList.remove(openClass);
+    render();
   };
 
   toggle.addEventListener("click", () => {
-    if (!desktopMedia.matches) {
-      nav.classList.toggle(openClass);
-      render();
+    if (desktopMedia.matches) {
+      return;
+    }
+
+    nav.classList.toggle(openClass);
+    render();
+  });
+
+  nav.addEventListener("click", (event) => {
+    if (desktopMedia.matches) {
+      return;
+    }
+
+    if (event.target instanceof Element && event.target.closest(closeTargets)) {
+      closeMenu();
     }
   });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !nav.classList.contains(openClass)) {
+      return;
+    }
+
+    closeMenu();
+    toggle.focus();
+  });
+
+  desktopMedia.addEventListener("change", render);
 
   render();
 });
@@ -296,8 +345,16 @@ public async Task<TicketCreationResult> CreateAsync(CreateTicketRequest request)
     };
 
     _dbContext.Tickets.Add(ticket);
-    await _dbContext.SaveChangesAsync();
-    return TicketCreationResult.Success();
+
+    try
+    {
+        await _dbContext.SaveChangesAsync();
+        return TicketCreationResult.Success();
+    }
+    catch (DbUpdateException)
+    {
+        return TicketCreationResult.Failed((string.Empty, "The ticket could not be saved. Please try again."));
+    }
 }
 ```
 
@@ -368,29 +425,46 @@ The Razor View was then updated so that authenticated users see a section on the
 ```cshtml
 @if (Model.IsAuthenticated)
 {
-    <div class="card shadow-sm border-0 sts-home__tickets">
-        <div class="card-body p-4">
-            <h2 class="h4 mb-1 sts-home__tickets-heading">Latest Tickets for @Model.CurrentTeam</h2>
-            <p class="text-secondary mb-0 sts-home__tickets-copy">
-                Showing the 10 most recently added tickets for your team.
-            </p>
-
-            @if (Model.RecentTickets.Count == 0)
-            {
-                <div class="alert alert-light border mb-0">
-                    No tickets have been added for your team yet.
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0 sts-home__tickets">
+            <div class="card-body p-4">
+                <div
+                    class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                    <div>
+                        <h2 class="h4 mb-1 sts-home__tickets-heading">Latest Tickets for @Model.CurrentTeam</h2>
+                        <p class="text-secondary mb-0 sts-home__tickets-copy">Showing the 10 most recently added
+                            tickets for your team.</p>
+                    </div>
+                    <a asp-controller="Ticket" asp-action="Add"
+                       class="btn btn-outline-primary sts-home__action sts-home__action--list">Add New</a>
                 </div>
-            }
-            else
-            {
-                @foreach (var ticket in Model.RecentTickets)
+
+                @if (Model.RecentTickets.Count == 0)
                 {
-                    <div class="list-group-item px-0 py-3 sts-home__ticket-item">
-                        <h3 class="h6 mb-1">@ticket.Subject</h3>
-                        <span class="badge text-bg-light border">@ticket.Team</span>
+                    <div class="alert alert-light border mb-0">
+                        No tickets have been added for your team yet.
                     </div>
                 }
-            }
+                else
+                {
+                    <div class="list-group list-group-flush sts-home__ticket-list">
+                        @foreach (var ticket in Model.RecentTickets)
+                        {
+                            <div class="list-group-item px-0 py-3 sts-home__ticket-item">
+                                <div
+                                    class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                                    <div>
+                                        <h3 class="h6 mb-1">@ticket.Subject</h3>
+                                        <span class="badge text-bg-light border">@ticket.Team</span>
+                                    </div>
+                                    <small
+                                        class="text-secondary sts-home__timestamp">@ticket.CreatedAtUtc.ToLocalTime().ToString("g")</small>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
         </div>
     </div>
 }
@@ -535,7 +609,7 @@ The home page displayed only the relevant team tickets, ordered from newest to o
 
 In addition to the manual acceptance tests, we implemented automated unit and integration tests that cover functional Sprint 2 behavior. These tests verify ticket creation, recent-ticket retrieval, filtering by team, newest-first ordering, form validation, and authentication-related flow such as redirecting anonymous users away from the ticket entry page.
 
-Current automated test result: **51/51 tests passing**.
+Current automated test result: **52/52 tests passing**.
 
 ## 5. Error Handling and Validation
 
