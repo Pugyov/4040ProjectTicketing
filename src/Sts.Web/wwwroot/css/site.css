@@ -33,6 +33,18 @@ body {
   width: auto;
 }
 
+.sts-site-nav__toggle {
+  transition: border-color 180ms cubic-bezier(0.4, 0, 0.2, 1), background-color 180ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sts-site-nav__toggle:focus {
+  box-shadow: none;
+}
+.sts-site-nav__toggle:focus-visible {
+  box-shadow: none;
+  border-color: rgba(13, 110, 253, 0.18);
+  background-color: rgba(13, 110, 253, 0.04);
+}
+
 .sts-site-nav__link {
   font-size: 1rem;
   font-weight: 500;
@@ -191,5 +203,8 @@ body {
   .sts-home__timestamp {
     display: block;
     margin-top: 5px;
+  }
+  .sts-home__ticket-list > .list-group-item:last-child {
+    padding-bottom: 0 !important;
   }
 }

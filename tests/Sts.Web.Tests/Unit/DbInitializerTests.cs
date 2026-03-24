@@ -38,17 +38,57 @@ public class DbInitializerTests
                 .OrderBy(ticket => ticket.CreatedAtUtc)
                 .ToListAsync();
 
-            Assert.Equal(6, tickets.Count);
+            Assert.Equal(12, tickets.Count);
             Assert.All(tickets, ticket => Assert.Equal(expectedUser.Team, ticket.Team));
         }
 
         var firstCount = await dbContext.Tickets.CountAsync();
-        Assert.Equal(18, firstCount);
+        Assert.Equal(36, firstCount);
 
         await DbInitializer.SeedDemoDataAsync(services);
 
         var secondCount = await dbContext.Tickets.CountAsync();
         Assert.Equal(firstCount, secondCount);
+    }
+
+    [Fact]
+    public async Task SeedDemoDataAsync_ShouldTopUpExistingDemoUsersToFullTicketSet()
+    {
+        using var scope = BuildScope();
+        var services = scope.ServiceProvider;
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var dbContext = services.GetRequiredService<AppDbContext>();
+
+        var devUser = new ApplicationUser
+        {
+            UserName = "dev@sts.com",
+            Email = "dev@sts.com",
+            Name = "Dev User",
+            Team = Team.Development,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(devUser, DbInitializer.DemoUserPassword);
+        Assert.True(result.Succeeded);
+
+        for (var index = 1; index <= 6; index++)
+        {
+            dbContext.Tickets.Add(new Ticket
+            {
+                Subject = $"Legacy Dev Ticket {index:00}",
+                Description = $"Legacy seeded ticket {index:00}",
+                Team = Team.Development,
+                Status = TicketStatus.Open,
+                CreatedByUserId = devUser.Id,
+                CreatedAtUtc = new DateTime(2026, 3, 20, 8, 0, 0, DateTimeKind.Utc).AddMinutes(index)
+            });
+        }
+
+        await dbContext.SaveChangesAsync();
+
+        await DbInitializer.SeedDemoDataAsync(services);
+
+        Assert.Equal(12, await dbContext.Tickets.CountAsync(ticket => ticket.CreatedByUserId == devUser.Id));
     }
 
     private static IServiceScope BuildScope()

@@ -37,15 +37,19 @@ public static class DbInitializer
                 await userManager.CreateAsync(user, DemoUserPassword);
             }
 
-            var hasSeededTickets = await dbContext.Tickets
-                .AnyAsync(ticket => ticket.CreatedByUserId == user.Id);
+            var existingTicketCount = await dbContext.Tickets
+                .CountAsync(ticket => ticket.CreatedByUserId == user.Id);
 
-            if (hasSeededTickets)
+            var missingTickets = BuildTicketsForUser(user)
+                .Skip(existingTicketCount)
+                .ToArray();
+
+            if (missingTickets.Length == 0)
             {
                 continue;
             }
 
-            dbContext.Tickets.AddRange(BuildTicketsForUser(user));
+            dbContext.Tickets.AddRange(missingTickets);
         }
 
         await dbContext.SaveChangesAsync();
@@ -65,7 +69,13 @@ public static class DbInitializer
                 new TicketSeed("Sales dashboard export issue", "CSV export returns an empty file for filtered results.", TicketStatus.Open),
                 new TicketSeed("Broken password reset email template", "Reset emails are missing the action link for some users.", TicketStatus.New),
                 new TicketSeed("Profile page validation message overlap", "Validation text overlaps the save button on narrow screens.", TicketStatus.Closed),
-                new TicketSeed("Reporting API returns 500 on large payloads", "The endpoint fails when generating monthly summary reports.", TicketStatus.Open)
+                new TicketSeed("Reporting API returns 500 on large payloads", "The endpoint fails when generating monthly summary reports.", TicketStatus.Open),
+                new TicketSeed("Database migration rollback request", "The staging rollback needs an audit before production deployment.", TicketStatus.New),
+                new TicketSeed("Search indexing lag on support articles", "Newly published articles are not searchable for several minutes.", TicketStatus.Open),
+                new TicketSeed("Session timeout inconsistency", "Users stay signed in longer than the configured inactivity window.", TicketStatus.Open),
+                new TicketSeed("Webhook retry queue growth", "Failed webhook retries are accumulating faster than they are processed.", TicketStatus.New),
+                new TicketSeed("Audit trail export formatting", "The CSV export does not preserve multiline notes correctly.", TicketStatus.Closed),
+                new TicketSeed("Internal dashboard chart rendering bug", "The revenue chart disappears after changing the date range twice.", TicketStatus.Open)
             },
             Team.Support => new[]
             {
@@ -74,7 +84,13 @@ public static class DbInitializer
                 new TicketSeed("Laptop battery replacement follow-up", "Two devices are still waiting for hardware service.", TicketStatus.Open),
                 new TicketSeed("Helpdesk phone queue misrouting", "Calls for billing are being routed to general support.", TicketStatus.New),
                 new TicketSeed("Office Wi-Fi guest password update", "Reception needs the new guest credentials posted.", TicketStatus.Closed),
-                new TicketSeed("Adobe license activation problem", "A designer cannot activate the assigned Creative Cloud seat.", TicketStatus.Open)
+                new TicketSeed("Adobe license activation problem", "A designer cannot activate the assigned Creative Cloud seat.", TicketStatus.Open),
+                new TicketSeed("New starter account access checklist", "HR requested a status update on onboarding access for the newest hires.", TicketStatus.New),
+                new TicketSeed("Conference room display reset", "The main presentation display forgets its configuration after restart.", TicketStatus.Open),
+                new TicketSeed("Password manager invite not received", "A team member did not receive the expected vault invitation.", TicketStatus.Open),
+                new TicketSeed("Remote desktop policy confirmation", "Management needs support to verify the latest remote access policy rollout.", TicketStatus.New),
+                new TicketSeed("Escalated spam filter false positives", "Several internal emails were incorrectly moved to spam.", TicketStatus.Closed),
+                new TicketSeed("Badge reader troubleshooting", "The third-floor door reader intermittently fails for valid staff badges.", TicketStatus.Open)
             },
             Team.Sales => new[]
             {
@@ -83,7 +99,13 @@ public static class DbInitializer
                 new TicketSeed("Pipeline dashboard filter mismatch", "Quarterly filters show totals that do not match the raw report.", TicketStatus.Open),
                 new TicketSeed("Discount form missing regional options", "The discount request form does not list all sales regions.", TicketStatus.New),
                 new TicketSeed("Expired campaign list cleanup", "Old campaign entries were removed from the weekly dashboard.", TicketStatus.Closed),
-                new TicketSeed("Opportunity stage audit request", "Management requested a review of stale opportunities in negotiation.", TicketStatus.Open)
+                new TicketSeed("Opportunity stage audit request", "Management requested a review of stale opportunities in negotiation.", TicketStatus.Open),
+                new TicketSeed("Territory reassignment summary", "Several accounts need to be reassigned before the next quarter starts.", TicketStatus.New),
+                new TicketSeed("Commission report rounding issue", "Totals differ by small amounts between dashboard and exported report.", TicketStatus.Open),
+                new TicketSeed("Renewal reminder duplication", "Some clients received the same renewal reminder twice.", TicketStatus.Open),
+                new TicketSeed("Trade show lead tagging", "New event leads are missing the correct campaign tag in the CRM.", TicketStatus.New),
+                new TicketSeed("Regional sales forecast snapshot", "The forecasting snapshot for EMEA needs to be regenerated.", TicketStatus.Closed),
+                new TicketSeed("Proposal template branding mismatch", "The enterprise proposal template shows outdated brand colors.", TicketStatus.Open)
             },
             _ => Array.Empty<TicketSeed>()
         };

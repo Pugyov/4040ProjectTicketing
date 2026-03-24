@@ -11,6 +11,17 @@
 .sts-site-nav__list
   width: auto
 
+.sts-site-nav__toggle
+  transition: border-color vars.$transition-duration-fast vars.$transition-ease-standard, background-color vars.$transition-duration-fast vars.$transition-ease-standard, box-shadow vars.$transition-duration-fast vars.$transition-ease-standard
+
+  &:focus
+    box-shadow: none
+
+  &:focus-visible
+    box-shadow: none
+    border-color: rgba(13, 110, 253, 0.18)
+    background-color: rgba(13, 110, 253, 0.04)
+
 .sts-site-nav__link
   font-size: vars.$font-size-base
   font-weight: 500
