@@ -1,0 +1,41 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - link "Support Ticketing System" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - button "Toggle navigation" [ref=e5] [cursor=pointer]
+  - main [ref=e7]:
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - paragraph [ref=e14]: Ticket Entry
+          - heading "Add New Ticket" [level=1] [ref=e15]
+          - paragraph [ref=e16]: Submit a support ticket for Development, Support, or Sales.
+        - link "Back Home" [ref=e17] [cursor=pointer]:
+          - /url: /
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e20]: Subject
+          - textbox "Subject" [ref=e21]
+        - generic [ref=e22]:
+          - generic [ref=e23]: Description
+          - textbox "Description" [ref=e24]
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e27]: Team
+            - combobox "Team" [ref=e28]:
+              - option "-- Select Team --" [selected]
+              - option "Development"
+              - option "Support"
+              - option "Sales"
+          - generic [ref=e29]:
+            - generic [ref=e30]: Status
+            - combobox "Status" [ref=e31]:
+              - option "-- Select Status --" [selected]
+              - option "New"
+              - option "Open"
+              - option "Closed"
+        - generic [ref=e32]:
+          - button "Save Ticket" [ref=e33] [cursor=pointer]
+          - link "Cancel" [ref=e34] [cursor=pointer]:
+            - /url: /

@@ -1,0 +1,31 @@
+Nikolay Pugyov
+Stories 3 and 4 - User login and user logout
+STS Project • Sprint 1
+Implemented work
+Implemented the login page and
+authentication POST flow in
+AccountController.
+Connected the controller to AccountService,
+which verifies email existence and password
+correctness through ASP.NET Identity.
+Implemented logout as an authorized POST
+action that signs the user out and redirects to
+the home page.
+Updated the navigation behavior so
+anonymous users see Register/Login and
+authenticated users see Logout.
+DetailsLogin returns specific feedback for unknown
+email vs. incorrect password.
+Cookie auth is configured with /Account/Login
+as the login path.
+Tests cover valid login, bad email format,
+wrong password, unknown email, and logout
+redirect behavior.
+Story 3: login form
+ Story 4: logged-in state with logout
+Why this mattered in Sprint 1
+These features completed the full authentication loop. After Sprint 1, a
+user can enter the system, create an account, sign in, and safely end
+the session - which is the baseline required before implementing ticket
+creation and workflow features.
+3

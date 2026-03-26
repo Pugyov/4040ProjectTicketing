@@ -1,0 +1,16 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - navigation [ref=e3]:
+      - link "Support Ticketing System" [ref=e4] [cursor=pointer]:
+        - /url: /
+      - button "Toggle navigation" [ref=e24] [cursor=pointer]
+  - main [ref=e13]:
+    - generic [ref=e17]:
+      - paragraph [ref=e18]: Support Desk Portal
+      - heading "Welcome to STS" [level=1] [ref=e19]
+      - paragraph [ref=e20]: Create and track support tickets across Development, Support, and Sales teams.
+      - generic [ref=e21]:
+        - link "Create Account" [ref=e22] [cursor=pointer]:
+          - /url: /Account/Register
+        - link "Sign In" [ref=e23] [cursor=pointer]:
+          - /url: /Account/Login
