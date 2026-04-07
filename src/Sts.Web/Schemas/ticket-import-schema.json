@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "required": ["tickets"],
+  "additionalProperties": false,
+  "properties": {
+    "tickets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["subject", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "subject": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "status": {
+            "type": "string",
+            "enum": ["New", "Open", "Closed"]
+          }
+        }
+      }
+    }
+  }
+}

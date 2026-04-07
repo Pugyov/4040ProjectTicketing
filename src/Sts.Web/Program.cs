@@ -37,6 +37,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddTransient<IPasswordValidator<ApplicationUser>, StartsWithLetterPasswordValidator>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITicketService, TicketService>();
+builder.Services.AddScoped<ITicketImportService, TicketImportService>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

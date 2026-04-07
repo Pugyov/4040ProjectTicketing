@@ -38,6 +38,13 @@ src/Sts.Web/appsettings.Development.json
 # OS / temporary files
 *.swp
 *.tmp
+tmp/
 
 # Frontend tooling
 node_modules/
+.playwright-cli/
+
+# Local databases
+src/Sts.Web/*.db
+src/Sts.Web/*.db-shm
+src/Sts.Web/*.db-wal

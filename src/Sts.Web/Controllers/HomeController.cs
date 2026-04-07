@@ -22,7 +22,8 @@ public class HomeController : Controller
     {
         var model = new HomeIndexViewModel
         {
-            IsAuthenticated = User.Identity?.IsAuthenticated ?? false
+            IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
+            UnresolvedSummary = (await _ticketService.GetUnresolvedSummaryAsync()).Items
         };
 
         if (!model.IsAuthenticated)

@@ -5,6 +5,10 @@
 
 <section class="sts-home row justify-content-center g-4">
     <div class="col-lg-9">
+        @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+        {
+            <div class="alert alert-success" role="alert">@Model.StatusMessage</div>
+        }
         <div class="card shadow-sm border-0 overflow-hidden sts-home__hero">
             <div class="card-body p-4 p-md-5">
                 <p class="text-uppercase text-primary-emphasis small fw-semibold mb-2 sts-home__eyebrow">Support Desk
@@ -26,6 +30,42 @@
                         <a asp-controller="Account" asp-action="Login"
                            class="btn btn-outline-secondary sts-home__action sts-home__action--secondary">Sign In</a>
                     }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0 sts-home__summary">
+            <div class="card-body p-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+                    <div>
+                        <p class="text-uppercase text-primary-emphasis small fw-semibold mb-2">Operational Snapshot</p>
+                        <h2 class="h4 mb-1">Unresolved Tickets by Team</h2>
+                        <p class="text-secondary mb-0">Counts show separate totals for tickets with status New and Open.</p>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th scope="col">Team</th>
+                            <th scope="col">New</th>
+                            <th scope="col">Open</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var summaryItem in Model.UnresolvedSummary)
+                        {
+                            <tr>
+                                <td>@summaryItem.Team</td>
+                                <td>@summaryItem.NewCount</td>
+                                <td>@summaryItem.OpenCount</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -59,14 +99,31 @@
                             @foreach (var ticket in Model.RecentTickets)
                             {
                                 <div class="list-group-item px-0 py-3 sts-home__ticket-item">
-                                    <div
-                                        class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
                                         <div>
                                             <h3 class="h6 mb-1">@ticket.Subject</h3>
-                                            <span class="badge text-bg-light border">@ticket.Team</span>
+                                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                <span class="badge text-bg-light border">@ticket.Team</span>
+                                                <span class="badge text-bg-light border">@ticket.Status</span>
+                                            </div>
                                         </div>
-                                        <small
-                                            class="text-secondary sts-home__timestamp">@ticket.CreatedAtUtc.ToLocalTime().ToString("g")</small>
+                                        <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-2">
+                                            <small class="text-secondary sts-home__timestamp">@ticket.CreatedAtUtc.ToLocalTime().ToString("g")</small>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <a asp-controller="Ticket"
+                                                   asp-action="Edit"
+                                                   asp-route-id="@ticket.Id"
+                                                   class="btn btn-outline-secondary btn-sm">Edit</a>
+                                                <form asp-controller="Ticket"
+                                                      asp-action="Delete"
+                                                      asp-route-id="@ticket.Id"
+                                                      method="post"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Are you sure you want to delete this ticket?');">
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             }

@@ -27,44 +27,34 @@ public class HomePageTests : IClassFixture<TestWebApplicationFactory>
         Assert.Contains("Welcome to STS", html);
         Assert.Contains("Register", html);
         Assert.Contains("Login", html);
-        Assert.Contains("sts-site-nav__brand", html);
-        Assert.Contains("sts-site-nav__list", html);
-        Assert.Contains("sts-site-nav__panel", html);
-        Assert.Contains("sts-home", html);
-        Assert.Contains("sts-home__hero", html);
-        Assert.Contains("sts-home__actions", html);
-        Assert.Contains("data-sts-nav-toggle", html);
-        Assert.Contains("/js/site-nav.js", html);
-        Assert.DoesNotContain("data-bs-toggle=\"collapse\"", html);
+        Assert.Contains("Unresolved Tickets by Team", html);
+        Assert.True(html.IndexOf("Welcome to STS", StringComparison.Ordinal) < html.IndexOf("Unresolved Tickets by Team", StringComparison.Ordinal));
+        Assert.Contains("Development", html);
+        Assert.Contains("Support", html);
+        Assert.Contains("Sales", html);
+        Assert.Contains(">New<", html);
+        Assert.Contains(">Open<", html);
+        Assert.DoesNotContain(">Import<", html);
+        Assert.DoesNotContain(">Edit<", html);
+        Assert.DoesNotContain(">Delete<", html);
     }
 
     [Fact]
-    public async Task HomePage_AuthenticatedUser_ShouldRenderBemHooksForNavAndTickets()
+    public async Task HomePage_ShouldShowUnresolvedSummaryCounts_AndExcludeClosedTickets()
     {
         var client = _factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
 
-        var registerResponse = await Register(client, "home-hooks@example.com", "A1234", "Home Hooks", "Development");
-        Assert.Equal(HttpStatusCode.Redirect, registerResponse.StatusCode);
-
-        var createTicketResponse = await client.PostAsync("/Ticket/Add", new FormUrlEncodedContent(new Dictionary<string, string>
-        {
-            ["Subject"] = "Homepage Hook Ticket",
-            ["Description"] = "Verifies the authenticated home markup contract.",
-            ["Team"] = "Development",
-            ["Status"] = "New"
-        }));
-        Assert.Equal(HttpStatusCode.Redirect, createTicketResponse.StatusCode);
-
         var response = await client.GetAsync("/");
-        response.EnsureSuccessStatusCode();
 
+        response.EnsureSuccessStatusCode();
         var html = await response.Content.ReadAsStringAsync();
 
-        Assert.Contains("sts-site-nav__action", html);
-        Assert.Contains("sts-home__status-pill", html);
-        Assert.Contains("sts-home__tickets", html);
-        Assert.Contains("sts-home__tickets-heading", html);
-        Assert.Contains("sts-home__timestamp", html);
+        Assert.Contains("Unresolved Tickets by Team", html);
+        Assert.Contains("<td>Development</td>", html);
+        Assert.Contains("<td>4</td>", html);
+        Assert.Contains("<td>6</td>", html);
+        Assert.Contains("<td>Support</td>", html);
+        Assert.Contains("<td>Sales</td>", html);
     }
 
     private static Task<HttpResponseMessage> Register(HttpClient client, string email, string password, string name, string team)

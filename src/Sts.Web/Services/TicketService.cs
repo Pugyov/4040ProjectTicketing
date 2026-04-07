@@ -52,10 +52,97 @@ public class TicketService : ITicketService
             .Take(maxCount)
             .Select(ticket => new RecentTicketListItem
             {
+                Id = ticket.Id,
                 Subject = ticket.Subject,
                 Team = ticket.Team,
+                Status = ticket.Status,
                 CreatedAtUtc = ticket.CreatedAtUtc
             })
             .ToListAsync();
+    }
+
+    public async Task<TicketSummaryQueryResult> GetUnresolvedSummaryAsync()
+    {
+        var unresolvedCounts = await _dbContext.Tickets
+            .AsNoTracking()
+            .Where(ticket => ticket.Status == TicketStatus.New || ticket.Status == TicketStatus.Open)
+            .GroupBy(ticket => ticket.Team)
+            .Select(group => new
+            {
+                Team = group.Key,
+                NewCount = group.Count(ticket => ticket.Status == TicketStatus.New),
+                OpenCount = group.Count(ticket => ticket.Status == TicketStatus.Open)
+            })
+            .ToDictionaryAsync(item => item.Team);
+
+        var items = Enum.GetValues<Team>()
+            .Select(team => new TeamTicketSummaryItem
+            {
+                Team = team,
+                NewCount = unresolvedCounts.GetValueOrDefault(team)?.NewCount ?? 0,
+                OpenCount = unresolvedCounts.GetValueOrDefault(team)?.OpenCount ?? 0
+            })
+            .ToArray();
+
+        return new TicketSummaryQueryResult
+        {
+            Items = items
+        };
+    }
+
+    public async Task<EditableTicketDetails?> GetEditableTicketAsync(int ticketId, Team requestingTeam)
+    {
+        return await _dbContext.Tickets
+            .AsNoTracking()
+            .Where(ticket => ticket.Id == ticketId && ticket.Team == requestingTeam)
+            .Select(ticket => new EditableTicketDetails
+            {
+                Id = ticket.Id,
+                Subject = ticket.Subject,
+                Description = ticket.Description,
+                Team = ticket.Team,
+                Status = ticket.Status
+            })
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task<TicketUpdateResult> UpdateAsync(TicketUpdateRequest request)
+    {
+        var ticket = await _dbContext.Tickets
+            .SingleOrDefaultAsync(item => item.Id == request.TicketId && item.Team == request.RequestingTeam);
+
+        if (ticket is null)
+        {
+            return TicketUpdateResult.Missing();
+        }
+
+        ticket.Subject = request.Subject;
+        ticket.Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description;
+        ticket.Status = request.Status;
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+            return TicketUpdateResult.Success();
+        }
+        catch (DbUpdateException)
+        {
+            return TicketUpdateResult.Failed((string.Empty, "The ticket could not be updated. Please try again."));
+        }
+    }
+
+    public async Task<TicketDeletionResult> DeleteAsync(int ticketId, Team requestingTeam)
+    {
+        var ticket = await _dbContext.Tickets
+            .SingleOrDefaultAsync(item => item.Id == ticketId && item.Team == requestingTeam);
+
+        if (ticket is null)
+        {
+            return TicketDeletionResult.Missing();
+        }
+
+        _dbContext.Tickets.Remove(ticket);
+        await _dbContext.SaveChangesAsync();
+        return TicketDeletionResult.Success();
     }
 }
